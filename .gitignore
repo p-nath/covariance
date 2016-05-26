@@ -1,4 +1,6 @@
 .DS_Store
 *.pyc
 *.o
-main
+covariance_main
+output.txt
+output_numpy.txt

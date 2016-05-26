@@ -24,4 +24,6 @@ Matrix* Product(Matrix* m1, Matrix* m2);
 
 Matrix* Mean(Matrix* matrix);
 
+void DestroyMatrix(Matrix* matrix);
+
 #endif

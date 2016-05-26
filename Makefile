@@ -1,7 +1,7 @@
-all: main
+all: covariance_main
 
-main: covariance_main.o matrix.o
-	gcc -o main covariance_main.o matrix.o
+covariance_main: covariance_main.o matrix.o
+	gcc -o covariance_main covariance_main.o matrix.o
 
 matrix.o: matrix.c
 	gcc -c -Wall matrix.c

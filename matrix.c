@@ -13,6 +13,14 @@ Matrix* CreateNewMatrix(int n, int m) {
   return matrix;
 }
 
+
+void DestroyMatrix(Matrix* matrix) {
+  for (int n = 0; n < matrix->rows; n++) {
+    free(matrix->data[n]);
+  }
+  free(matrix);
+}
+
 Matrix* ReadMatrix(char *file_name) {
   double x;
   char flag;
@@ -31,8 +39,6 @@ Matrix* ReadMatrix(char *file_name) {
       fseek(fin, 1, SEEK_CUR);
       matrix->data[n][m] = x;
     }
-    while (flag != '\n')
-      fscanf(fin, "%c", &flag);
   }
   fclose(fin);
   printf("Matrix read from %s\n", file_name);
@@ -42,23 +48,21 @@ Matrix* ReadMatrix(char *file_name) {
 void WriteMatrix(FILE* file_pointer, Matrix* matrix) {
   for (int n = 0; n < matrix->rows; n++) {
     for (int m = 0; m < matrix->columns; m++) {
-      fprintf(file_pointer, "%lf ",matrix->data[n][m]);
-      
+      if (m == matrix->columns - 1)  fprintf(file_pointer, "%lf\n", matrix->data[n][m]);
+      else  fprintf(file_pointer, "%lf ",matrix->data[n][m]);
     }
-    fprintf(file_pointer, "\n");
   }
-  fclose(stdout);
 }
 
 Matrix* Transpose(Matrix* matrix) {
-  Matrix* transpose_matrix;
-  transpose_matrix = CreateNewMatrix(matrix->columns, matrix->rows);
-  for (int n = 0; n < transpose_matrix->rows; n++) {
-    for (int m = 0; m < transpose_matrix->columns; m++) {
-      transpose_matrix->data[n][m] = matrix->data[m][n];
+  Matrix* transpose;
+  transpose = CreateNewMatrix(matrix->columns, matrix->rows);
+  for (int n = 0; n < transpose->rows; n++) {
+    for (int m = 0; m < transpose->columns; m++) {
+      transpose->data[n][m] = matrix->data[m][n];
     }
   }
-  return transpose_matrix;
+  return transpose;
 }
 
 Matrix* Product(Matrix* m1, Matrix* m2) {
@@ -81,34 +85,37 @@ Matrix* Product(Matrix* m1, Matrix* m2) {
 }
 
 Matrix* Mean(Matrix* matrix) {
-  double* array_avg = (double*)malloc(sizeof(double)*matrix->columns);
+  double* column_avg = (double*)malloc(sizeof(double)*matrix->columns);
   double sum = 0;
-  Matrix* mean_matrix = CreateNewMatrix(matrix->rows, matrix->columns);
+  Matrix* mean = CreateNewMatrix(matrix->rows, matrix->columns);
   for (int n = 0; n < matrix->columns; n++) {
     sum = 0;
     for (int m = 0; m < matrix->rows; m++) {
       sum += matrix->data[m][n];
     }
-    array_avg[n] = sum/mean_matrix->rows;
+    column_avg[n] = sum/mean->rows;
   }
-  for (int m = 0; m < mean_matrix->columns; m++) {
-    for (int n = 0; n < mean_matrix->rows; n++) {
-      mean_matrix->data[n][m] = matrix->data[n][m] - array_avg[m];
+  for (int m = 0; m < mean->columns; m++) {
+    for (int n = 0; n < mean->rows; n++) {
+      mean->data[n][m] = matrix->data[n][m] - column_avg[m];
     }
   }
-  return mean_matrix;
+  return mean;
 }
 
 Matrix* Covariance(Matrix* matrix) {
-  Matrix* covar_matrix = CreateNewMatrix(matrix->columns, matrix->columns);
-  Matrix* mean_matrix = Mean(matrix);
-  Matrix* transpose_matrix = Transpose(mean_matrix);
-  Matrix* product = Product(transpose_matrix, mean_matrix);
+  Matrix* covariance = CreateNewMatrix(matrix->columns, matrix->columns);
+  Matrix* mean = Mean(matrix);
+  Matrix* transpose = Transpose(mean);
+  Matrix* product = Product(transpose, mean);
 
-  for (int n = 0; n < covar_matrix->rows; n++) {
-    for (int m = 0; m < covar_matrix->columns; m++) {
-      covar_matrix->data[n][m]= product->data[n][m]/(matrix->rows -1);
+  for (int n = 0; n < covariance->rows; n++) {
+    for (int m = 0; m < covariance->columns; m++) {
+      covariance->data[n][m]= product->data[n][m]/(matrix->rows -1);
     }
   }
-  return covar_matrix;
+  DestroyMatrix(mean);
+  DestroyMatrix(transpose);
+  DestroyMatrix(product);
+  return covariance;
 }

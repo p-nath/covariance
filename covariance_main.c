@@ -21,19 +21,20 @@ int parse_args(int argc, char** argv, char **input_filename, char **output_filen
 int main(int argc, char **argv) {
   char *input_filename = NULL, *output_filename = NULL;
   if (!parse_args(argc, argv, &input_filename, &output_filename))  exit(-1);
-  FILE *fout = stdout;
+  FILE *fout = NULL;
+  if (!(fout = fopen(output_filename,"w")))  fout = stdout;
   Matrix *m1 = NULL, *covariance;
+  
   m1 = ReadMatrix(input_filename);
 
   covariance = Covariance(m1);
-  printf("Covariance matrix:\n");
-
-  if (!(output_filename == NULL)) {
-    fout = fopen(output_filename,"w");
-    printf("Output written in %s\n", output_filename);
-  }
   WriteMatrix(fout, covariance);
-  fclose(fout);
-  
+  if (!(fout == stdout)) {
+    printf("Output was written in %s\n", output_filename);
+    fclose(fout);
+  }
+
+  DestroyMatrix(m1);
+  DestroyMatrix(covariance);
   return 0;
 }
