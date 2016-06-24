@@ -11,5 +11,6 @@ matrix.c: matrix.h
 covariance_main.o: covariance_main.c
 	gcc -c -Wall covariance_main.c
 
-
+clean:
+	rm *.o
 
