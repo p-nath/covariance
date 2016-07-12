@@ -3,4 +3,4 @@
 *.o
 covariance_main
 output.txt
-output_numpy.txt
+output_py.txt
