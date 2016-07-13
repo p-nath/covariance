@@ -9,13 +9,14 @@ void help(char *program_name) {
 }
 
 bool parse_args(int argc, char** argv, char **input_filename, char **output_filename) {
-  if (argc < 3)  return false;
+  if (argc < 3)  
+    return false;
   for (int i = 0; i < argc; i++) {
-    if (strcmp(argv[i], "-i") == 0) {
+    if (strcmp(argv[i], "-i") == 0 && i+1 < argc) {
       i++;
       *input_filename = argv[i];
     }
-    if (strcmp(argv[i], "-o") == 0) {
+    if (strcmp(argv[i], "-o") == 0 && i+1 < argc) {
       i++;
       *output_filename = argv[i];
     }
